@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include ("components/header") %>
+        <title>Login</title>
+    </head>
+    <body>
+        <%- include ("components/nav") %>
+        <div class="p-5">
+            <h1>Welcome to <%= // user.name %>'s page</h1>
+            <img src="<%= //user.thumbnail %>" alt="" />
+
+            <div class="d-flex flex-wrap">
+                <% for (let i = 0; i < 100; i ++) {%>
+                <div class="card text-center m-2" style="width: 24rem">
+                    <div class="card-header">
+                        Featured <%= //posts[i].title %>
+                    </div>
+                    <div class="card-body">
+                        Content.<%= //posts[i].content %>
+                    </div>
+
+                    <div class="card-footer">Footer<%= //posts[i].date %></div>
+                </div>
+                <% } %>
+            </div>
+            <% // } %>
+        </div>
+    </body>
+</html>

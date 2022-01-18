@@ -8,6 +8,14 @@ const authRoute = require("./routes/auth-route");
 const profileRoute = require("./routes/profile-route");
 dotenv.config();
 
+mongoose
+    .connect(process.env.MONGO_ATLAS_CONNECT, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => console.log("Connect to MongoDB Atlas"))
+    .catch((err) => console.log(err));
+
 // middleware
 app.use(express.static("public"));
 app.use(favicon(path.join(__dirname, "public", "images", "logo.png")));

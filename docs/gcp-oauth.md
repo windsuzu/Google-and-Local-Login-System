@@ -37,4 +37,8 @@
 
 ![](assets/gcp-6.jpeg)
 
+* 到用戶端當中填入 `重新導向 url`
+
+![](assets/gcp-7.jpeg)
+
 完成後我們就可以利用 passport.js 實作 Google 登入了 !

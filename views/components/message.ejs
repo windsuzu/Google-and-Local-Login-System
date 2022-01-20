@@ -1,0 +1,20 @@
+<!-- Error Message for Sign up -->
+<% if (error_msg != "") {%>
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong><%= error_msg %> </strong>
+</div>
+<% } %>
+
+<!-- Success Message for Sign up -->
+<% if (success_msg != "") {%>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong><%= success_msg %> </strong>
+</div>
+<% } %>
+
+<!-- Error Message for LocalStrategy Login -->
+<% if (error != "") {%>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong><%= error %> </strong>
+</div>
+<% } %>

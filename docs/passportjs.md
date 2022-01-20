@@ -76,24 +76,30 @@ return done(err);
 app.use(passport.initialize());
 ```
 
-若使用的是 **stateful authentication** (session-based 的認證) 時，你需要額外也初始化 session。 Passport 的 session 要在 cookie-session 之後啟動。
+若使用的是 **stateful authentication** (session-based 的認證) 時，你需要額外也初始化 session。 Passport 的 session 要在 express-session 之後啟動。
 
 ``` js
-app.use(CookieSession({ keys: [process.env.COOKIE_SECRET] }));
+app.use(
+    session({
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: true,
+    })
+);
 app.use(passport.session());
 ```
 
 ### Session (stateful authentication)
 
-當登入成功時，伺服器會建立驗證的 session，並在用戶端瀏覽器的 cookie 中放入驗證資訊，方便之後透過該資訊驗證其他的網路要求 (request)。
+當登入成功，伺服器會建立驗證的 session，並在用戶端瀏覽器的 cookie 中放入驗證資訊，方便之後讓 session 透過該資訊驗證該用戶的網路要求 (request)。
 
-Passport 使用的驗證資訊是 user.id，並且使用**序列化 / 反序列化 (serialize / deserialize)** user.id 來和 session 驗證。
+Passport 使用的驗證資訊是 user.id，並且使用**序列化 / 反序列化 (serialize / deserialize)** user.id 來傳到 session 驗證。
 
 ![](assets/passport-session.png)
 
 > Passport Sessions drawn by [Wilson Ren](https://www.udemy.com/user/wilson-r-6/)
 
-在 deserialize 且驗證成功後，每個 req 都將包含 `req.user` 和 `req.isAuthenicated()` 及 `req.logOut()` 三個函式。
+在 deserialize 且驗證成功後，每個 req 都將包含 session 中存放的 `req.user` 資料，和 `req.isAuthenicated()` 及 `req.logOut()` 兩個函式。
 
 ``` js
 passport.serializeUser((user, done) => {
@@ -109,11 +115,19 @@ passport.deserializeUser((id, done) => {
 
 ## Example
 
+* [Google](#google)
+  * [Authenticate, Redirect](#authenticate-redirect)
+  * [Passport Strategy, Callback](#passport-strategy-callback)
+* [Local](#local)
+  * [Authenticate, Redirect](#authenticate-redirect-1)
+  * [Passport Strategy, Callback](#passport-strategy-callback-1)
+* [AuthCheck](#authcheck)
+
 ### Google
 
 #### Authenticate, Redirect
 
-* auth-route.js
+* [auth-route.js](../routes/auth-route.js)
 
 ``` js
 router.get(
@@ -130,25 +144,9 @@ router.get("/google/redirect", passport.authenticate("google"), (req, res) =>
 );
 ```
 
-* profile-route.js
-
-``` js
-// Middleware checks if the user is logged in
-const authCheck = (req, res, next) => {
-    if (!req.isAuthenticated()) res.redirect("/auth/login");
-    else next();
-};
-
-// 1. Put the middleware in the second parameter
-// 2. Benefit from Session authentication, we can get user data from req.user
-router.get("/", authCheck, (req, res) => {
-    res.render("profile", { user: req.user });
-});
-```
-
 #### Passport Strategy, Callback
 
-* passport.js
+* [passport.js](../configs/passport.js)
 
 ``` js
 passport.use(
@@ -192,3 +190,119 @@ passport.use(
 
 ### Local
 
+### Sign Up
+
+* [auth-route.js](../routes/auth-route.js)
+
+``` js
+router.post("/signup", async (req, res) => {
+    let { name, email, password } = req.body;
+    const emailExist = await User.findOne({ email });
+    if (emailExist) {
+        req.flash("error_msg", "This email has been registered.");
+        return res.redirect("signup");
+    }
+
+    password = await bcrypt.hash(password, 10);
+    const newUser = new User({ name, email, password });
+    newUser
+        .save()
+        .then((savedUser) => {
+            req.flash(
+                "success_msg",
+                "Registration succeeds! You can now login!"
+            );
+            return res.redirect("login");
+        })
+        .catch((err) => {
+            req.flash("error_msg", err.errors.name.properties.message);
+            return res.redirect("signup");
+        });
+});
+```
+
+#### Authenticate, Redirect
+
+* [auth-route.js](../routes/auth-route.js)
+
+``` js
+router.post(
+    "/login",
+    passport.authenticate("local", {
+        failureRedirect: "login",
+        failureFlash: "The email or password is incorrect.",
+    }),
+    (req, res) => res.redirect("/profile")
+);
+```
+
+#### Passport Strategy, Callback
+
+* [passport.js](../configs/passport.js)
+
+``` js
+passport.use(
+    new LocalStrategy((username, password, done) => {
+        User.findOne({ email: username })
+            .then((foundUser) => {
+                // email not correct
+                if (!foundUser || !foundUser.password) return done(null, false);
+
+                bcrypt.compare(password, foundUser.password, (err, correct) => {
+                    // password not corrct
+                    if (err) return done(err);
+                    if (!correct) return done(null, false);
+
+                    return done(null, foundUser);
+                });
+            })
+            .catch((err) => done(err));
+    })
+);
+```
+
+---
+
+### Session
+
+* [index.js](../index.js)
+
+``` js
+app.use(
+    session({
+        secret: process.env.SECRET,
+        resave: false,
+        saveUninitialized: true,
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+```
+
+* [passport.js](../configs/passport.js)
+
+``` js
+passport.serializeUser((user, done) => done(null, user._id));
+
+passport.deserializeUser((_id, done) =>
+    User.findById({ _id }, (err, user) => done(err, user))
+);
+```
+
+### AuthCheck
+
+* [profile-route.js](../routes/profile-route.js)
+
+``` js
+// Middleware checks if the user is logged in
+const authCheck = (req, res, next) => {
+    if (!req.isAuthenticated()) res.redirect("/auth/login");
+    else next();
+};
+
+// 1. Put the middleware in the second parameter
+// 2. Benefit from Session authentication, we can get user data from req.user
+router.get("/", authCheck, (req, res) => {
+    res.render("profile", { user: req.user });
+});
+```

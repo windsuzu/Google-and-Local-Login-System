@@ -13,11 +13,8 @@
                 <div
                     class="d-flex flex-column align-items-center text-center mt-5 p-5"
                 >
-                    <img
-                        class="rounded-circle"
-                        src="<%= user.avatarUrl %>"
-                        alt="Avatar"
-                    />
+                    <img class="rounded-circle" src="<%= user.avatarUrl ||
+                    "images/default_avatar.png" %>" alt="Avatar" width=150px />
                     <span class="font-weight-bold p-3"><%= user.name %></span>
                     <span class="font-weight-bold pb-3"
                         ><%= user.date.toDateString() %></span

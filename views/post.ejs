@@ -2,13 +2,25 @@
 <html lang="en">
   <head>
     <%- include ("components/header") %>
-    <title>Post</title>
+    <title>Post | Login System</title>
   </head>
   <body>
     <%- include ("components/nav") %>
     <main style="padding: 3rem">
       <%- include ("components/message") %>
       <form action="/profile/post" method="POST">
+        <div class="form-group">
+          <label for="exampleforAuthor">Author</label>
+          <input
+            name="Author"
+            type="text"
+            class="form-control"
+            id="exampleforAuthor"
+            value="<%= user.name %>"
+            disabled
+          />
+        </div>
+        <br />
         <div class="form-group">
           <label for="exampleforTitle">Title</label>
           <input

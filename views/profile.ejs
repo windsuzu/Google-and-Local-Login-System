@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <%- include ("components/header") %>
-        <title>Login</title>
+        <title>Profile | Login System</title>
     </head>
     <body style="background-color: rgb(243, 243, 243)">
         <%- include ("components/nav") %>
@@ -24,43 +24,17 @@
                 <div
                     class="posts d-flex flex-row flex-wrap flex-grow-1 justify-content-center"
                 >
-                    <% for (let i = 0; i < 3; i ++) {%>
+                    <% for (let i = 0; i < posts.length; i ++) {%>
                     <div class="card text-center m-2" style="width: 280px">
-                        <div class="card-header">
-                            Featured <%= //posts[i].title %>
-                        </div>
-                        <div class="card-body">
-                            Content.<%= //posts[i].content %>
-                        </div>
-
+                        <div class="card-header"><%= posts[i].title %></div>
+                        <div class="card-body"><%= posts[i].content %></div>
                         <div class="card-footer">
-                            Footer<%= //posts[i].date %>
+                            <%= posts[i].date.toDateString() %>
                         </div>
                     </div>
                     <% } %>
                 </div>
             </div>
         </div>
-
-        <!-- <div class="p-5">
-            <h1>Welcome to <%= user.name %>'s page</h1>
-            <img src="<%= user.avatarUrl %>" alt="" />
-
-            <div class="d-flex flex-wrap">
-                <% for (let i = 0; i < 5; i ++) {%>
-                <div class="card text-center m-2" style="width: 24rem">
-                    <div class="card-header">
-                        Featured <%= //posts[i].title %>
-                    </div>
-                    <div class="card-body">
-                        Content.<%= //posts[i].content %>
-                    </div>
-
-                    <div class="card-footer">Footer<%= //posts[i].date %></div>
-                </div>
-                <% } %>
-            </div>
-            <% // } %>
-        </div> -->
     </body>
 </html>

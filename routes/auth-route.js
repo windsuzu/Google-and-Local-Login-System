@@ -28,9 +28,19 @@ router.get("/signup", (req, res) => {
  */
 
 router.get("/logout", (req, res) => {
+    req.session.returnUrl = "";
     req.logOut();
     res.redirect("/");
 });
+
+function redirect_origin(req, res) {
+    const origin = req.session.returnUrl;
+    if (origin) {
+        req.session.returnUrl = "";
+        return res.redirect(origin);
+    }
+    return res.redirect("/profile");
+}
 
 /**
  * ===========================
@@ -47,8 +57,10 @@ router.get(
 );
 
 // The url ("/google/redirect") needs to be the same as in GoogleStrategy
-router.get("/google/redirect", passport.authenticate("google"), (req, res) =>
-    res.redirect("/profile")
+router.get(
+    "/google/redirect",
+    passport.authenticate("google"),
+    redirect_origin
 );
 
 /**
@@ -88,7 +100,7 @@ router.post(
         failureRedirect: "login",
         failureFlash: "The email or password is incorrect.",
     }),
-    (req, res) => res.redirect("/profile")
+    redirect_origin
 );
 
 module.exports = router;

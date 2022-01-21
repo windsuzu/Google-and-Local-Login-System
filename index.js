@@ -8,7 +8,7 @@ const ProfileRoute = require("./routes/profile-route");
 const passport = require("passport");
 require("dotenv").config();
 require("./configs/passport");
-const session = require("express-session");
+const session = require("cookie-session");
 const flash = require("connect-flash");
 
 mongoose
@@ -52,4 +52,4 @@ app.get("/", (req, res) => {
     res.render("index", { user: req.user });
 });
 
-app.listen(8080);
+app.listen(process.env.PORT || 3000);

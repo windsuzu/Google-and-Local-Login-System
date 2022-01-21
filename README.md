@@ -70,6 +70,7 @@ GaLLS 使用 passport.js 來控制 Google 登入 (passport-google-oauth20)，以
 - [GCP OAuth 流程](docs/gcp-oauth.md)
 - [MongoDB Atlas 流程](docs/mongodb-atlas.md)
 - [passport.js 概念與實作](docs/passportjs.md)
+- [上架 Heroku 前需要知道的事](docs/heroku.md)
 
 其他的網站特色與功能，還有相關程式碼請參考 [Features](#features) 😊
 
